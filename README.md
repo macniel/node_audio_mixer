@@ -11,3 +11,5 @@ played back in Edge, Chrome and Firefox. the dependent FFMPEG installer should b
 npm install
 node index.js
 ```
+
+Your default Browser should open the app that is listening on `localhost:1337`
