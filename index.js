@@ -33,7 +33,7 @@ function getPlaylist() {
 }
 
 function insertPlaylist(data) {
-    structure = getPlaylist();
+    const structure = getPlaylist();
     structure.files.push(data);
     fs.writeFileSync(path.join(__dirname, "playlist.json"), JSON.stringify(structure));
     return structure;
@@ -55,9 +55,7 @@ var upload = multer({ storage: storage });
 app.post('/add', upload.single('file'), (req, res) => {
     const file = req.file;
     const targetFilename = guid();
-    console.log('>>>', file);
-
-    let proc = ffmpeg()
+    const proc = ffmpeg()
         .addInput(file.path)
         .withAudioCodec('libvorbis')
         .withNoVideo()
@@ -82,7 +80,7 @@ app.get('/fileinfo', (req, res) => {
     res.send('').end();
 });
 app.get('/fileinfo/:fileRef', (req, res) => {
-    let proc = ffmpeg();
+    const proc = ffmpeg();
     if (fs.existsSync(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'))) {
         proc.addInput(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'))
             .complexFilter('aformat=channel_layouts=mono,showwavespic=s=668x64:colors=#FFFFFF88')
@@ -107,7 +105,7 @@ app.get('/playlist', (req, res) => {
 });
 
 app.delete('/deleteTrack/:guid', (req, res) => {
-    let structure = getPlaylist();
+    const structure = getPlaylist();
     let index = -1;
     for (index in structure.files) {
         if (structure.files[index].guid === req.params['guid'])
@@ -119,7 +117,7 @@ app.delete('/deleteTrack/:guid', (req, res) => {
 });
 
 app.put('/updateTrack/:guid', (req, res) => {
-    let structure = getPlaylist();
+    const structure = getPlaylist();
     for (file of structure.files) {
         if (file.guid == req.params['guid']) {
             file.title = req.body.newTitle;
@@ -133,17 +131,17 @@ app.put('/updateTrack/:guid', (req, res) => {
 app.get('/music/:fileRef', (req, res) => {
     fs.exists(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'), (exists) => {
         if (exists) {
-            var range = req.headers.range;
+            const range = req.headers.range;
             if (!range) {
                 // 416 Wrong range
                 return res.sendStatus(416);
             }
-            var positions = range.replace(/bytes=/, "").split("-");
-            var start = parseInt(positions[0], 10);
+            const positions = range.replace(/bytes=/, "").split("-");
+            const start = parseInt(positions[0], 10);
             const stats = fs.statSync(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'));
-            var total = stats.size;
-            var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-            var chunksize = (end - start) + 1;
+            const total = stats.size;
+            const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+            const chunksize = (end - start) + 1;
             res.writeHead(206, {
                 "Content-Range": "bytes " + start + "-" + end + "/" + total,
                 "Accept-Ranges": "bytes",
@@ -165,7 +163,6 @@ app.get('/music/:fileRef', (req, res) => {
 });
 
 app.get('/:filename', function (req, res) {
-
     res.sendFile(path.join(__dirname, 'static', req.params['filename']));
 });
 
