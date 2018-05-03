@@ -11,6 +11,14 @@ app.use(bodyParser.json());
 
 ffmpeg.setFfmpegPath(ffmpegCore.path);
 
+function getRealPath() {
+    if (__dirname.indexOf('snapshot') != -1) { // packaged into pkg app
+        return process.cwd();
+    } else { // cli called
+        return __dirname;
+    }
+}
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -22,12 +30,12 @@ function guid() {
 
 function getPlaylist() {
     let data = {};
-    if (fs.existsSync(path.join(__dirname, "playlist.json"))) {
-        data = JSON.parse(fs.readFileSync(path.join(__dirname, "playlist.json")));
+    if (fs.existsSync(path.join(getRealPath(), "playlist.json"))) {
+        data = JSON.parse(fs.readFileSync(path.join(getRealPath(), "playlist.json")));
     } else { // playlist does not yet exists
         data.version = 1.5;
         data.files = [];
-        fs.writeFileSync(path.join(__dirname, "playlist.json"), JSON.stringify(data));
+        fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify(data));
     }
     return data;
 }
@@ -35,7 +43,7 @@ function getPlaylist() {
 function insertPlaylist(data) {
     const structure = getPlaylist();
     structure.files.push(data);
-    fs.writeFileSync(path.join(__dirname, "playlist.json"), JSON.stringify(structure));
+    fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify(structure));
     return structure;
 }
 
@@ -66,14 +74,15 @@ app.post('/add', upload.single('file'), (req, res) => {
         playlist = insertPlaylist({
             guid: targetFilename,
             section: 'Zuletzt Hinzugefügt',
-            title: file.originalname
+            title: file.originalname,
+            color: 'default'
         });
         res.send(playlist).end();
     });
-    if (!fs.existsSync(path.join(__dirname, 'media'))) {
-        fs.mkdirSync(path.join(__dirname, 'media'));
+    if (!fs.existsSync(path.join(getRealPath(), 'media'))) {
+        fs.mkdirSync(path.join(getRealPath(), 'media'));
     };
-    proc.saveToFile(path.join(__dirname, 'media', targetFilename + '.ogg'));
+    proc.saveToFile(path.join(getRealPath(), 'media', targetFilename + '.ogg'));
 });
 
 app.get('/fileinfo', (req, res) => {
@@ -81,16 +90,16 @@ app.get('/fileinfo', (req, res) => {
 });
 app.get('/fileinfo/:fileRef', (req, res) => {
     const proc = ffmpeg();
-    if (fs.existsSync(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'))) {
-        proc.addInput(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'))
+    if (fs.existsSync(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'))) {
+        proc.addInput(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'))
             .complexFilter('aformat=channel_layouts=mono,showwavespic=s=668x64:colors=#FFFFFF88')
             .frames('1')
-            .save(path.join(__dirname, 'media', req.params['fileRef'] + '-waveform.png'))
+            .save(path.join(getRealPath(), 'media', req.params['fileRef'] + '-waveform.png'))
             .on('end', () => {
-                if (fs.existsSync(path.join(__dirname, 'media', req.params['fileRef'] + '-waveform.png'))) {
-                    res.sendFile(path.join(__dirname, 'media', req.params['fileRef'] + '-waveform.png'));
+                if (fs.existsSync(path.join(getRealPath(), 'media', req.params['fileRef'] + '-waveform.png'))) {
+                    res.sendFile(path.join(getRealPath(), 'media', req.params['fileRef'] + '-waveform.png'));
                 } else {
-                    res.sendFile(path.join(__dirname, 'unkown_stat.png'));
+                    res.sendFile(path.join(__dirname, 'static', 'unkown_stat.png'));
                 }
 
             });
@@ -112,7 +121,7 @@ app.delete('/deleteTrack/:guid', (req, res) => {
             break;
     }
     structure.files.splice(index, 1);
-    fs.writeFileSync(path.join(__dirname, "playlist.json"), JSON.stringify(structure));
+    fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify(structure));
     res.send(JSON.stringify(getPlaylist())).end();
 });
 
@@ -122,14 +131,15 @@ app.put('/updateTrack/:guid', (req, res) => {
         if (file.guid == req.params['guid']) {
             file.title = req.body.newTitle;
             file.section = req.body.newSection;
+            file.color = req.body.newColor;
         }
     }
-    fs.writeFileSync(path.join(__dirname, "playlist.json"), JSON.stringify(structure));
+    fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify(structure));
     res.send(JSON.stringify(getPlaylist())).end();
 });
 
 app.get('/music/:fileRef', (req, res) => {
-    fs.exists(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'), (exists) => {
+    fs.exists(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'), (exists) => {
         if (exists) {
             const range = req.headers.range;
             if (!range) {
@@ -138,7 +148,7 @@ app.get('/music/:fileRef', (req, res) => {
             }
             const positions = range.replace(/bytes=/, "").split("-");
             const start = parseInt(positions[0], 10);
-            const stats = fs.statSync(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'));
+            const stats = fs.statSync(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'));
             const total = stats.size;
             const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
             const chunksize = (end - start) + 1;
@@ -148,7 +158,7 @@ app.get('/music/:fileRef', (req, res) => {
                 "Content-Length": chunksize,
                 "Content-Type": "audio/ogg"
             });
-            const stream = fs.createReadStream(path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'), { start: start, end: end });
+            const stream = fs.createReadStream(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'), { start: start, end: end });
             stream.on("open", function () {
                 stream.pipe(res);
             });
@@ -156,7 +166,7 @@ app.get('/music/:fileRef', (req, res) => {
                 res.end(err);
             });
         } else {
-            console.log('file not found', path.join(__dirname, 'media', req.params['fileRef'] + '.ogg'));
+            console.log('file not found', path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'));
             return res.status(404).end();
         }
     })

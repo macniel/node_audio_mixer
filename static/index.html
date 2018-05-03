@@ -28,12 +28,16 @@
 
     <div class="dialog" id="editDialog" hidden>
         <div class="entry">
-            <label>Titel</label>
-            <input type="text" id="audioTitle">
+            <label for="title">Titel</label>
+            <input name="title" type="text" id="audioTitle">
         </div>
         <div class="entry">
-            <label>Sektion</label>
-            <input type="text" id="audioSection">
+            <label for="section">Sektion</label>
+            <input name="section" type="text" id="audioSection">
+        </div>
+        <div class="entry">
+            <label>Farbe</label>
+            <div id="dialogSwatches"></div>
         </div>
         <button onclick="updateTrack()">Übernehmen</button>
         <button onclick="cancelDialog()">Abbrechen</button>

@@ -50,6 +50,15 @@ function toggleSection(sectionHeader) {
 }
 
 // --- Dialog Controls ---
+const supportedColors = [
+    'red',
+    'yellow',
+    'green',
+    'default',
+    'blue',
+    'purple',
+    'pink'
+];
 
 function editFile(event, index) {
     let file = _G.playlist[index];
@@ -57,11 +66,22 @@ function editFile(event, index) {
     console.log(_G, _G.playlist[index]);
     $('#audioTitle').val(file.title);
     $('#audioSection').val(file.section);
-
+    selectedDialogColor = file.color;
+    $('#dialogSwatches').empty();
+    for (const colorSwatch of supportedColors) {
+        createNewColorSwatch(colorSwatch);
+    }
+    $('#editDialog .swatch[value=' + (file.color != null ? file.color : 'default') + ']').attr('selected', 'selected');
     $('#editDialog').removeAttr('hidden');
     event.stopPropagation();
     event.preventDefault();
     return false;
+}
+
+function selectColor(colorSwatch) {
+    $('.swatch').removeAttr('selected');
+    $(colorSwatch).attr('selected', 'selected');
+    selectedDialogColor = $(colorSwatch).attr('value');
 }
 
 function cancelDialog() {
@@ -89,7 +109,7 @@ function updateTrack() {
             url: '/updateTrack/' + _G.dialogFile.guid,
             method: 'PUT',
             contentType: 'application/json',
-            data: JSON.stringify({ newTitle: $('#audioTitle').val(), newSection: $('#audioSection').val() }),
+            data: JSON.stringify({ newTitle: $('#audioTitle').val(), newSection: $('#audioSection').val(), newColor: selectedDialogColor }),
             dataType: 'json',
             success: (data) => {
                 buildPlaylistUI(JSON.stringify(data));
@@ -142,6 +162,12 @@ function playOrPause(source) {
 
 // --- UI building from Playlist ---
 
+function createNewColorSwatch(colorName) {
+    let swatch = $('#dialogSwatches').append(`<div class="swatch ${colorName}" value="${colorName}" onclick="selectColor(this)"> <div class="inner-triangle"></div>
+    <div class="outer-triangle"></div></div>`);
+    return swatch;
+}
+
 function createNewHeader(title) {
     let articleElement = $('#playlist').append(`<article class='expanded' data-title="${title}
         "><header data-title="${title} " onclick="toggleSection(this) "><span/></header>
@@ -152,7 +178,7 @@ function createNewHeader(title) {
 }
 
 function createNewAudio(parent, fileObject, idx) {
-    parent.after(`<section class="item " onclick="playOrPause(this) " data-guid="${fileObject.guid}
+    parent.after(`<section class="item ${fileObject.color != null ? fileObject.color : 'default'}" onclick="playOrPause(this) " data-guid="${fileObject.guid}
         " data-title="${fileObject.title} ">
         <div class="seeker "></div>
         <img src="/fileinfo/${fileObject.guid}">
