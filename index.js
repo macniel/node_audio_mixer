@@ -7,6 +7,7 @@ const express = require('express');
 const multer = require('multer');
 const app = express();
 const bodyParser = require('body-parser');
+const { spawn } = require('child_process');
 app.use(bodyParser.json());
 
 ffmpeg.setFfmpegPath(ffmpegCore.path);
@@ -181,7 +182,12 @@ app.get('/', function (req, res) {
 });
 
 
-app.listen(1337, () => {
+const server = app.listen(1337, () => {
     console.log('listening on port 1337');
-    opn('http://localhost:1337/');
+    spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe', ['-app=http://localhost:1337']).on('close', () => {
+        console.log('client app terminated');
+        server.close();
+    }).on('error', (err) => {
+        console.log(err);
+    });
 })
