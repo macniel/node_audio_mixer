@@ -243,7 +243,7 @@ function main() {
         _G.currentPlaying.classList.remove('playing');
         _G.audioPlayer.currentTime = 0;
         if (_G.loop == 'loopOne') {
-            playOrPause(currentPlaying);
+            playOrPause(_G.currentPlaying);
         } else if (_G.loop == 'loopSection') {
             if (nextElement != null) {
                 playOrPause(nextElement);
