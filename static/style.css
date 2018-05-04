@@ -185,7 +185,7 @@ article header span:after {
     border: 4px solid var(--button-border-color);
     border-radius: 16px;
     color: var(--button-border-color);
-    content: 'arrow_drop_down';
+    content: 'arrow_drop_up';
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
@@ -197,7 +197,7 @@ article header span:after {
 }
 
 article.expanded header span:after {
-    content: 'arrow_drop_up';
+    content: 'arrow_drop_down';
 }
 
 article section {
