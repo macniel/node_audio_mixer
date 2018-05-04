@@ -73,7 +73,6 @@ body {
     margin: 10px;
     margin-left: 36px;
     margin-right: 16px;
-    max-width: 668px;
     position: relative;
 }
 
@@ -116,6 +115,8 @@ body {
 
 .item img {
     opacity: var(--item-waveform-opacity);
+    width: 100%;
+    height: 100%;
 }
 
 .item:after {
