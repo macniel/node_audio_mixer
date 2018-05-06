@@ -171,7 +171,7 @@ function createNewColorSwatch(colorName) {
 function createNewHeader(title) {
     let articleElement = $('#playlist').append(`<article class='expanded' data-title="${title}
         "><header data-title="${title} " onclick="toggleSection(this) "><span/></header>
-        <div class="droptarget "></div>
+        <div class="droptarget"></div>
         </article>`);
 
     return $(`header[data-title="${title} "]`, '#playlist');
@@ -179,14 +179,72 @@ function createNewHeader(title) {
 
 function createNewAudio(parent, fileObject, idx) {
     parent.after(`<section class="item ${fileObject.color != null ? fileObject.color : 'default'}" onclick="playOrPause(this) " data-guid="${fileObject.guid}
-        " data-title="${fileObject.title} ">
+        " data-title="${fileObject.title}"  ondrop="onListDrop(event, '${fileObject.guid}')" draggable="true" ondragstart="onListDragStart(event, '${fileObject.guid}')" ondragenter="onListDragging(event)" ondragover="onListDragStop(event)">
         <div class="seeker "></div>
         <img src="/fileinfo/${fileObject.guid}">
         <button class="material-icons inline " onclick="editFile(event, ${idx}) ">edit</button>
     </section>`);
 }
 
+function onListDragStart(event, sourceGuid) {
+    console.log(sourceGuid);
+    event.dataTransfer.setData('text', sourceGuid);
+}
+function onListDragStop(event) {
+    event.preventDefault();
+}
+
+function onListDragging(event) {
+    event.preventDefault();
+
+}
+
+function onListDrop(event, targetGuid) {
+    const sourceGuid = event.dataTransfer.getData('text');
+    let sourceElement;
+    let targetElement;
+    let sourceIndex;
+    let targetIndex;
+    let index = 0;
+    for (const element of _G.playlist) {
+
+        if (element.guid === sourceGuid) {
+            sourceElement = element;
+            sourceIndex = index;
+        }
+        if (element.guid === targetGuid) {
+            targetElement = element;
+            targetIndex = index;
+        }
+        index++;
+    }
+    if (targetIndex === sourceIndex) return;
+    if (sourceElement.section !== targetElement.section) {
+        sourceElement.section = targetElement.section;
+    }
+    let tempPlaylist = _G.playlist.slice(0);
+    const tempElement = tempPlaylist[targetIndex];
+    tempPlaylist[targetIndex] = tempPlaylist[sourceIndex];
+    tempPlaylist[sourceIndex] = tempElement;
+    updatePlaylist(tempPlaylist);
+    buildPlaylistUIFromJSON({ files: tempPlaylist });
+}
+
+function updatePlaylist(newPlaylist) {
+    $.ajax({
+        url: '/updatePlaylist/',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(newPlaylist),
+        dataType: 'json',
+        success: (data) => {
+            buildPlaylistUI(JSON.stringify(data));
+        }
+    });
+}
+
 function buildPlaylistUIFromJSON(data) {
+    console.log($(_G.currentPlaying).data('position'));
     $('#playlist').empty();
     data.files.sort((a, b) => {
         if (a.section > b.section) return 1
@@ -219,12 +277,12 @@ function buildPlaylistUI(fromData) {
         });
     }
 
+
 }
 
 // --- Bootstrap Javascript ---
 
 function main() {
-    console.log('init');
     _G.audioPlayer.addEventListener('timeupdate', (event) => {
         if (_G.currentPlaying != null) {
             const factor = (_G.audioPlayer.currentTime / _G.audioPlayer.duration) * 100;
@@ -239,7 +297,6 @@ function main() {
         const nextElement = $('section.playing + section')[0];
         const firstElement = $('section', $('section.playing').parent())[0];
         $('#nowplaying').text('playback ended');
-        console.log(nextElement, firstElement);
         _G.currentPlaying.classList.remove('playing');
         _G.audioPlayer.currentTime = 0;
         if (_G.loop == 'loopOne') {
@@ -266,6 +323,7 @@ function main() {
 
     document.getElementById('volumeTracker').addEventListener('change', (event) => {
         _G.maxVolume = event.srcElement.value;
+        //TODO: also set the maxVolume of the current Song to this
         $('#player').animate({ volume: _G.maxVolume }, 1000)
     });
 
