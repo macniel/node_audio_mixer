@@ -170,11 +170,11 @@ function createNewColorSwatch(colorName) {
 
 function createNewHeader(title) {
     let articleElement = $('#playlist').append(`<article class='expanded' data-title="${title}
-        "><header data-title="${title} " onclick="toggleSection(this) "><span/></header>
-        <div class="droptarget"></div>
+        "><header data-title="${title}" onclick="toggleSection(this) "><span>${title}</span></header>
+        <div></div>
         </article>`);
 
-    return $(`header[data-title="${title} "]`, '#playlist');
+    return $(`header[data-title="${title}"]`, '#playlist');
 }
 
 function createNewAudio(parent, fileObject, idx) {
@@ -185,6 +185,8 @@ function createNewAudio(parent, fileObject, idx) {
         <button class="material-icons inline " onclick="editFile(event, ${idx}) ">edit</button>
     </section>`);
 }
+
+// begin drag and drop functionality
 
 function onListDragStart(event, sourceGuid) {
     console.log(sourceGuid);
@@ -229,6 +231,8 @@ function onListDrop(event, targetGuid) {
     updatePlaylist(tempPlaylist);
     buildPlaylistUIFromJSON({ files: tempPlaylist });
 }
+
+// end drag and drop functionality
 
 function updatePlaylist(newPlaylist) {
     $.ajax({
