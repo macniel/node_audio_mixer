@@ -177,7 +177,7 @@ article {
     position: relative;
 }
 
-article.expanded section {
+article.expanded app-audiofile {
     display: block;
 }
 
@@ -201,7 +201,7 @@ article.expanded header span:after {
     content: 'arrow_drop_down';
 }
 
-article section {
+article app-audiofile {
     display: none;
 }
 

@@ -133,50 +133,56 @@ app.put('/updateTrack/:guid', (req, res) => {
             file.title = req.body.newTitle;
             file.section = req.body.newSection;
             file.color = req.body.newColor;
+            console.log(file);
         }
-    }
+     }
     fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify(structure));
     res.send(JSON.stringify(getPlaylist())).end();
 });
 
 app.get('/music/:fileRef', (req, res) => {
-    fs.exists(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'), (exists) => {
-        if (exists) {
-            const range = req.headers.range;
-            if (!range) {
-                // 416 Wrong range
-                return res.sendStatus(416);
-            }
-            const positions = range.replace(/bytes=/, "").split("-");
-            const start = parseInt(positions[0], 10);
-            const stats = fs.statSync(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'));
-            const total = stats.size;
-            const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-            const chunksize = (end - start) + 1;
-            res.writeHead(206, {
-                "Content-Range": "bytes " + start + "-" + end + "/" + total,
-                "Accept-Ranges": "bytes",
-                "Content-Length": chunksize,
-                "Content-Type": "audio/ogg"
-            });
-            const stream = fs.createReadStream(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'), { start: start, end: end });
-            stream.on("open", function () {
-                stream.pipe(res);
-            });
-            stream.on("error", function (err) {
-                res.end(err);
-            });
-        } else {
-            console.log('file not found', path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'));
-            return res.status(404).end();
+    const filename = path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg');
+    if ( fs.existsSync(filename) ) {
+        /*console.log(req.headers.range);
+        
+        const range = req.headers.range;
+        if (!range) {
+            // 416 Wrong range
+            return res.sendStatus(416);
         }
-    })
+        const positions = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(positions[0], 10);
+        const stats = fs.statSync(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'));
+        const total = stats.size;
+        const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+        const chunksize = (end - start) + 1;
+        res.writeHead(200, {
+            "Content-Range": "bytes " + start + "-" + end + "/" + total,
+            "Accept-Ranges": "bytes",
+            "Content-Length": chunksize,
+            "Content-Type": "audio/ogg"
+        });
+        const stream = fs.createReadStream(path.join(getRealPath(), 'media', req.params['fileRef'] + '.ogg'), { start: start, end: end });
+        stream.on("open", function (event) {
+            console.log('Stream opened', event, 'Range', req.header.range);
+            stream.pipe(res);
+        });
+        stream.on("error", function (err) {
+            console.log(err);
+            res.end(err);
+        });*/
+        res.sendFile(filename);
+    } else {
+        console.log('file not found', filename);
+        return res.status(404).end();
+    }
 });
 
 app.get('/:filename', function (req, res) {
     res.sendFile(path.join(__dirname, 'static', req.params['filename']));
 });
 
+app.use(express.static('static'));
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
@@ -184,10 +190,10 @@ app.get('/', function (req, res) {
 
 const server = app.listen(1337, () => {
     console.log('listening on port 1337');
-    spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe', ['-app=http://localhost:1337']).on('close', () => {
+    /*spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe', ['-app=http://localhost:1337']).on('close', () => {
         console.log('client app terminated');
         server.close();
     }).on('error', (err) => {
         console.log(err);
-    });
+    });*/
 })
