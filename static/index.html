@@ -7,11 +7,11 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet/less" type="text/css" href="style.less">
     <title>Audio Mixer v1.75</title>
-    <link rel="icon" href="icon-144.png">
-    <link rel="apple-touch-icon" href="/icon-57.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="/icon-72.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="/icon-114.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
+    <link rel="icon" href="/assets/icon-144.png">
+    <link rel="apple-touch-icon" href="/assets/icon-57.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/icon-72.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/icon-114.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/icon-144.png" />
 </head>
 
 <body>
@@ -40,12 +40,13 @@
             <button id="stopAll" class="material-icons pull-right">stop</button>
             <input id="volumeTracker" type="range" class="tracker pull-right" min="0" max="1" step="0.01" value="1" />
         </div>
+        <form name="uploadForm" action="/add" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileSelector">
+        </form>
+    
     </div>
 
-    <form name="uploadForm" action="/add" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" id="fileSelector">
-    </form>
-
+    
     <script src="main.js" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/3.7.1/less.min.js" ></script>
 </body>

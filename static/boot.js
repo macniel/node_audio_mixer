@@ -124,6 +124,8 @@ export default class Boot {
     uploadFile(file) {
         var data, xhr;
 
+        document.getElementById('uploader').classList.add('waiting');
+
         data = new FormData();
         data.append('file', document.querySelector('#fileSelector').files[0]);
 
@@ -131,7 +133,10 @@ export default class Boot {
 
         xhr.open('POST', '/add', true);
         xhr.onreadystatechange = (response) => {
+            
             if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById('uploader').classList.remove('waiting');
+
                 this.buildPlaylistUI(xhr.responseText);
             }
         };
