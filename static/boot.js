@@ -1,14 +1,14 @@
 import AudioFile from './components/audiofile.js';
+import Header from './components/header.js';
 
 export default class Boot {
 
     get loop() {
-
         return this._loop;
     }
 
     set loop(loopType) {
-        if ( loopType === 'loopNone' || loopType === 'loopOnce' || loopType === 'loopAll' ) {
+        if ( loopType === 'loopNone' || loopType === 'loopOne' || loopType === 'loopSection' ) {
             this._loop = loopType;
         } else {
             this._loop = 'loopNone';
@@ -47,25 +47,28 @@ export default class Boot {
     set currentPlaying(currentPlaying) {
         this._currentPlaying = currentPlaying;
     }
+
+    get display() {
+        return document.querySelector('#nowPlaying');
+    }
     
     constructor() {
         this.maxVolume = 1;
-        this.loop = 'loopOnce';
+        this.loop = 'loopOne';
         this.audioPlayer.addEventListener('timeupdate', (event) => {
             if (this.currentPlaying != null) {
-                const factor = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100;
-    
-                $('.seeker', this.currentPlaying).animate({ width: factor + '%' }, 1);
-                $(this.currentPlaying).data('position', this.audioPlayer.currentTime);
-                $('#nowPlaying').text($(this.currentPlaying).data('title'));
+                this.currentPlaying.updateSeeker(this.audioPlayer.currentTime, this.audioPlayer.duration);
+                
+                this.display.textContent = this.currentPlaying.title;
             }
         });
     
         this.audioPlayer.addEventListener('ended', (event) => {
-            const nextElement = $('section.playing + section')[0];
-            const firstElement = $('section', $('section.playing').parent())[0];
-            $('#nowplaying').text('playback ended');
-            console.log(nextElement, firstElement);
+            // refactor to use the playlist and not the dom
+            const nextElement = document.querySelector('app-audiofile.playing + app-audiofile');
+            const firstElement = document.querySelector('app-audiofile.playing').parentElement.querySelector('app-audiofile');
+            this.display.textContent = 'playback ended';
+            
             this.currentPlaying.classList.remove('playing');
             this.audioPlayer.currentTime = 0;
             if (this.loop === 'loopOne') {
@@ -81,7 +84,7 @@ export default class Boot {
         });
     
         document.getElementById('appTitle').addEventListener('click', () => {
-            $(':root').toggleClass('dark');
+            document.querySelector(':root').toggleClass('dark');
         });
     
         document.getElementById('fileSelector').addEventListener('change', (event) => {
@@ -123,7 +126,7 @@ export default class Boot {
         xhr = new XMLHttpRequest();
 
         xhr.open('POST', '/add', true);
-        xhr.onreadystatechange = function (response) {
+        xhr.onreadystatechange = (response) => {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 this.buildPlaylistUI(xhr.responseText);
             }
@@ -164,7 +167,7 @@ export default class Boot {
             console.log(result);
             switch ( result.action ) {
                 case 'delete':
-                    this.removeTrack(result.guid);
+                    this.removeTrack(result);
                     break;
                 case 'cancel':
                     break;
@@ -176,29 +179,35 @@ export default class Boot {
         this.editDialog.open(file);
     }
 
-    removeTrack(guid) {
-        $.ajax({
-            url: '/deleteTrack/' + guid,
-            method: 'DELETE',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: (data) => {
-                this.buildPlaylistUI(JSON.stringify(data));
+    removeTrack(result) {
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('DELETE', '/deleteTrack/' + result.guid, true);
+        xhr.contentType = 'application/json';
+        xhr.dataType = 'json';
+        xhr.onreadystatechange = (response) => {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                this.buildPlaylistUI(xhr.responseText);
             }
-        });
+        };
+        xhr.send();
     }
 
     updateTrack(result) {
-        $.ajax({
-            url: '/updateTrack/' + result.guid,
-            method: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify({ newTitle: result.title, newSection: result.section, newColor: result.color }),
-            dataType: 'json',
-            success: (data) => {
-                this.buildPlaylistUI(JSON.stringify(data));
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('PUT', '/updateTrack/' + result.guid, true);
+        const data = { newTitle: result.title, newSection: result.section, newColor: result.color };
+        console.log(result);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.onreadystatechange = (response) => {
+            console.log(response);
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                this.buildPlaylistUI(xhr.responseText);
             }
-        });
+        };
+        xhr.send(JSON.stringify(data));
     }
 
 // --- Audio Control ---
@@ -206,9 +215,11 @@ export default class Boot {
     stop() {
         this.audioPlayer.pause();
         this.audioPlayer.currentTime = 0;
-        $('section').removeClass('playing').data('position', 0);
-        $('section .seeker').css('width', '0%');
-        $('#nowPlaying').text('');
+        document.querySelectorAll('app-audiofile').forEach( element => {
+            element.classList.remove('playing');
+            element.position = 0;
+        });
+        this.display.textContent = '';
     }
 
     playOrPause(source) {
@@ -218,12 +229,12 @@ export default class Boot {
             }
             $('#player').animate({ volume: 0 }, 1000).promise().done(() => {
                 let audioSrc = document.querySelector('#player source');
-                audioSrc.src = '/music/' + $(source).data('guid');
+                audioSrc.src = '/music/' + source.guid;
                 audioSrc.type = 'audio/ogg';
                 this.audioPlayer.load();
                 this.audioPlayer.play();
-                if ($(source).data('position') != null) {
-                    this.audioPlayer.currentTime = $(source).data('position');
+                if (source.position != null) {
+                    this.audioPlayer.currentTime = source.position;
                 };
                 $('#player').animate({ volume: this.maxVolume }, 1000);
                 source.classList.add('playing');
@@ -246,12 +257,10 @@ export default class Boot {
 
 // --- UI building from Playlist ---
     createNewHeader(title) {
-        let articleElement = $('#playlist').append(`<article class='expanded' data-title="${title}
-            "><header data-title="${title} " onclick="toggleSection(this) "><span/></header>
-            <div class="droptarget "></div>
-            </article>`);
-
-        return $(`header[data-title="${title} "]`, '#playlist');
+        let header = new Header();
+        header.title = title;
+        document.querySelector('#playlist').appendChild(header);
+        return header.querySelector('header');
     }
 
     createNewAudio(parent, fileObject, idx) {
@@ -269,7 +278,7 @@ export default class Boot {
     }
 
     buildPlaylistUIFromJSON(data) {
-        $('#playlist').empty();
+        document.querySelector('#playlist').innerHTML = '';
         data.files.sort((a, b) => {
             if (a.section > b.section) return 1
             else if (a.section == b.section) return 0

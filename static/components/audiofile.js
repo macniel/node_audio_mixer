@@ -47,6 +47,10 @@ export default class AudioFile extends HTMLElement {
         }
     }
 
+    get seeker() {
+        return this.querySelector('div.seeker');
+    }
+
     static get observedAttributes() {
         return ['color', 'guid', 'title', 'callback', 'secondaryCallback'];
     }
@@ -66,6 +70,22 @@ export default class AudioFile extends HTMLElement {
         this.addEventListener('click', (event) => {
             this.clickHandler();
         });   
+    }
+
+    updateSeeker(currentTime, duration) {
+        const factor = (currentTime / duration) * 100;
+        //$('.seeker', this.currentPlaying).animate({ width: factor + '%' }, 1);
+        this.seeker.style.width = factor + '%'; 
+        this.dataset['position'] = currentTime;
+    }
+
+    set position(position) {
+        this._position = position;
+        this.seeker.style.width = position + '%';
+    }
+
+    get position() {
+        return this._position;
     }
 
     render() {

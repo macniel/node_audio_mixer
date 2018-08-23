@@ -83,6 +83,8 @@ export default class EditDialog extends HTMLElement {
         this.populateSwatches();
 
         this.querySelector('#saveBtn').addEventListener('click', (event) => {
+            this.fileTitle = this.querySelector('input[name="title"]').value;
+            this.fileSection = this.querySelector('input[name="section"]').value;
             event.preventDefault();
             event.stopPropagation();
             if ( this.callback != null && typeof this.callback === 'function' ) {
@@ -91,6 +93,8 @@ export default class EditDialog extends HTMLElement {
             return false;
         });
         this.querySelector('#cancelBtn').addEventListener('click', (event) => {
+            this.fileTitle = this.querySelector('input[name="title"]').value;
+            this.fileSection = this.querySelector('input[name="section"]').value;
             event.preventDefault();
             event.stopPropagation();
             if ( this.callback != null && typeof this.callback === 'function' ) {
@@ -126,7 +130,6 @@ export default class EditDialog extends HTMLElement {
             if ( element.colorName === event.detail.colorName ) {
                 element.selected = true;
                 this.fileColor = element.colorName;
-                console.log(this);
             } else {
                 element.selected = false;
             }
