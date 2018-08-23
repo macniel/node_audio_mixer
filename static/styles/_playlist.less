@@ -1,11 +1,11 @@
 article {
-    > * {
+    &.expanded > header span:before {
+        content: 'arrow_drop_down';
+    }   
+    > *:not(header) {
         display: none;
     }
-    &.expanded > * {
-        span:before {
-            content: 'arrow_drop_down';
-        }
+    &.expanded > *:not(header) {
         display: block;
     }
     position: relative;
