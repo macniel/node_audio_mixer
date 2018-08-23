@@ -1,0 +1,97 @@
+:root {
+    --workspace-color: white;
+    --text-color: black;
+    --highlight-text-color: rgb(59, 179, 159);
+    --highlight-face-color: rgb(59, 179, 159);
+    --dialog-face-color: rgb(235, 235, 235);
+    --button-toggle-face-color: rgb(9, 65, 55);
+    --button-face-color: rgb(38, 158, 137);
+    --button-highlight-color: rgb(55, 189, 164);
+    --button-highlight-text-color: rgb(9, 73, 62);
+    --button-face-text-color: white;
+    --button-border-color: rgb(235, 235, 235, 1);
+    --button-border-transparent-color: rgb(235, 235, 235, 0);
+    --button-danger-color: rgb(182, 30, 30);
+    --button-danger-highlight-color: rgb(256, 135, 135);
+    --item-background-default-color: rgba(8, 145, 121, 1);
+    --item-background-red-color: rgb(209, 84, 84);
+    --item-background-yellow-color: rgba(243, 193, 45, 1);
+    --item-background-green-color: rgba(11, 224, 6, 1);
+    --item-background-blue-color: rgb(48, 109, 184);
+    --item-background-purple-color: rgba(188, 81, 243, 1);
+    --item-background-pink-color: rgba(251, 163, 189, 1);
+    --item-seeker-overlay-color: rgba(255, 255, 255, 0.2);
+    --item-text-color: black;
+    --item-waveform-opacity: 1;
+    --shim-start: rgba(255, 255, 255, 0);
+    --shim-end: rgba(255, 255, 255, 1);
+}
+
+:root.dark {
+    --workspace-color: rgb(24, 32, 24);
+    --text-color: rgb(120, 120, 120);
+    --highlight-text-color: white;
+    --highlight-face-color: rgb(55, 189, 164);
+    --dialog-face-color: rgb(53, 53, 53);
+    --button-toggle-face-color: rgb(9, 65, 55);
+    --button-face-color: rgb(12, 82, 70);
+    --button-highlight-color: rgb(55, 189, 164);
+    --button-highlight-text-color: rgb(9, 73, 62);
+    --button-face-text-color: white;
+    --button-border-color: rgba(120, 120, 120, 1);
+    --button-border-transparent-color: rgba(120, 120, 120, 0);
+    --item-background-default-color: rgb(8, 33, 29);
+    --item-background-red-color: rgb(73, 9, 9);
+    --item-background-yellow-color: rgba(125, 95, 7, 1);
+    --item-background-green-color: rgba(4, 74, 2, 1);
+    --item-background-blue-color: rgba(1, 23, 50, 1);
+    --item-background-purple-color: rgba(46, 5, 67, 1);
+    --item-background-pink-color: rgb(82, 5, 27);
+    --item-seeker-overlay-color: rgba(255, 255, 255, 0.2);
+    --item-waveform-opacity: .5;
+    --item-text-color: white;
+    --shim-start: rgba(0, 0, 0, 0);
+    --shim-end: rgba(0, 0, 0, 1);
+}
+
+
+.red {
+    background: var(--item-background-red-color);
+}
+
+.yellow {
+    background: var(--item-background-yellow-color);
+}
+
+.green {
+    background: var(--item-background-green-color);
+}
+
+.default {
+    background: var(--item-background-default-color);
+}
+
+.blue {
+    background: var(--item-background-blue-color);
+}
+
+.purple {
+    background: var(--item-background-purple-color);
+}
+
+.pink {
+    background: var(--item-background-pink-color);
+}
+
+
+body {
+    background-color: var(--workspace-color);
+    color: var(--text-color);
+    margin-bottom: 80px;
+    margin-top: 100px;
+}
+
+* {
+    font-family: 'roboto';
+    font-size: 18pt;
+}

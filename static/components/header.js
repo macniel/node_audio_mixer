@@ -40,7 +40,8 @@ export default class Header extends HTMLElement {
     }
 
     connectedCallback() {
-        this.innerHTML = `<article class="${this.collapsed === true ? '' :'expanded'}" data-title="${this.title}"><header data-title="${this.title}"><span/></header></article>`;
+        this.innerHTML = `<article class="${this.collapsed === true ? '' :'expanded'}" data-title="${this.title}">
+        <header><span>${this.title}</span></header></article>`;
         this.querySelector('header').addEventListener('click', (event) => {
             event.stopPropagation();
             event.preventDefault();
@@ -56,7 +57,8 @@ export default class Header extends HTMLElement {
                 this.querySelector('article').className = 'expanded';
             }
             this.querySelector('article').dataset['title'] = this.title;
-            this.querySelector('header').dataset['title'] = this.title;
+            
+            this.getElementsByTagName('span')[0].textContent = this.title;
         }
     }
 

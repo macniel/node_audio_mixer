@@ -1,0 +1,51 @@
+.item {
+    &.playing:after {
+        font-weight: bold;
+    }
+    &:after {
+        color: var(--item-text-color);
+        content: attr(data-title);
+        font-size: 22px;
+        font-weight: normal;
+        left: 16px;
+        margin-top: -13px;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+    }
+
+    .seeker {
+        background: var(--item-seeker-overlay-color);
+        height: 64px;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 0%;
+    }
+    img {
+        opacity: var(--item-waveform-opacity);
+        width: 100%;
+        height: 100%;
+    }
+    
+    .material-icons.inline {
+        background-color: rgba(0, 0, 0, .2);
+        bottom: 0;
+        border: none;
+        border-radius: 0;
+        height: 64px;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 64px;
+    }
+    border-radius: 2px;
+    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+    height: 64px;
+    margin: 10px;
+    margin-left: 36px;
+    margin-right: 16px;
+    position: relative;
+}

@@ -1,0 +1,31 @@
+
+.form-bottom {
+    .inner {
+        position: relative;
+    }
+    #nowPlaying {
+        color: var(--text-color);
+        display: block;
+        font-size: 22px;
+        height: 22px;
+        left: 64px;
+        margin-top: -11px;
+        position: absolute;
+        right: 64px;
+        text-align: center;
+        top: 50%;
+        z-index: 1;
+    }
+    form[name="uploadForm"] {
+        left: -9999px;
+        position: absolute;
+    }
+    background: linear-gradient(to bottom, var(--shim-start) 0%, var(--shim-end) 50%);
+    bottom: 0;
+    height: 64px;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 50;
+}
+

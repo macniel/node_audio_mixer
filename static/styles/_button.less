@@ -1,0 +1,28 @@
+button {
+    &.material-icons {
+        border: 2px solid var(--button-border-color);
+        border-radius: 24px;
+        color: var(--button-face-text-color);
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        height: 48px;
+        margin: 8px;
+        width: 48px;
+        z-index: 2;
+    }
+    
+    &.toggle {
+        background-color: var(--button-toggle-face-color);
+    }
+    
+    &.active {
+        background-color: var(--button-highlight-color);
+        color: var(--button-highlight-text-color);
+    }
+
+    background-color: var(--button-face-color);
+    position: relative;
+    z-index: 2;
+}
+

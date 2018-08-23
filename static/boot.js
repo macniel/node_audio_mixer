@@ -51,6 +51,10 @@ export default class Boot {
     get display() {
         return document.querySelector('#nowPlaying');
     }
+
+    get playlistElement() {
+        return document.getElementById('playlist');
+    }
     
     constructor() {
         this.maxVolume = 1;
@@ -134,26 +138,6 @@ export default class Boot {
         xhr.send(data);
     }
 
-    switchLoopMode(source) {
-        if (this.loop == 'loopNone') {
-            this.loop = 'loopOne';
-            source.innerText = 'repeat_one';
-            source.classList.add('active');
-        } else if (this.loop == 'loopOne') {
-            this.loop = 'loopSection';
-            source.innerText = 'repeat';
-            source.classList.add('active');
-        } else if (this.loop == 'loopSection') {
-            this.loop = 'loopNone';
-            source.innerText = 'repeat';
-            source.classList.remove('active');
-        }
-    }
-
-    toggleSection(sectionHeader) {
-        $(sectionHeader).parent().toggleClass('expanded');
-    }
-
 // --- Dialog Controls ---
 
     get editDialog() {
@@ -176,6 +160,7 @@ export default class Boot {
             }
             this.editDialog.close();
         };
+        console.log(this.playlist);
         this.editDialog.open(file);
     }
 
@@ -212,10 +197,26 @@ export default class Boot {
 
 // --- Audio Control ---
 
+    switchLoopMode(source) {
+        if (this.loop == 'loopNone') {
+            this.loop = 'loopOne';
+            source.innerText = 'repeat_one';
+            source.classList.add('active');
+        } else if (this.loop == 'loopOne') {
+            this.loop = 'loopSection';
+            source.innerText = 'repeat';
+            source.classList.add('active');
+        } else if (this.loop == 'loopSection') {
+            this.loop = 'loopNone';
+            source.innerText = 'repeat';
+            source.classList.remove('active');
+        }
+    }
+
     stop() {
         this.audioPlayer.pause();
         this.audioPlayer.currentTime = 0;
-        document.querySelectorAll('app-audiofile').forEach( element => {
+        document.getElementsByTagName('app-audiofile').forEach( element => {
             element.classList.remove('playing');
             element.position = 0;
         });
@@ -259,7 +260,7 @@ export default class Boot {
     createNewHeader(title) {
         let header = new Header();
         header.title = title;
-        document.querySelector('#playlist').appendChild(header);
+        this.playlistElement.appendChild(header);
         return header.querySelector('header');
     }
 
@@ -278,7 +279,7 @@ export default class Boot {
     }
 
     buildPlaylistUIFromJSON(data) {
-        document.querySelector('#playlist').innerHTML = '';
+        this.playlistElement.innerHTML = '';
         data.files.sort((a, b) => {
             if (a.section > b.section) return 1
             else if (a.section == b.section) return 0

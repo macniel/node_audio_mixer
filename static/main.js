@@ -18,7 +18,7 @@ if (!customElements.get('app-audiofile')) {
 }
 
 if (!customElements.get('app-header')) {
-    customElements.define('app-header', Header);
+    customElements.define('app-subsection', Header);
 }
 
 new Boot();

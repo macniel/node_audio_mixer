@@ -1,0 +1,12 @@
+article {
+    > * {
+        display: none;
+    }
+    &.expanded > * {
+        span:before {
+            content: 'arrow_drop_down';
+        }
+        display: block;
+    }
+    position: relative;
+}
