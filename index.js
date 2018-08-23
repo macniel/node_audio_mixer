@@ -60,6 +60,12 @@ var storage = multer.diskStorage({
     }
 })
 
+app.post('/updatePlaylist', (req, res) => {
+    console.log(req.body);
+    fs.writeFileSync(path.join(getRealPath(), "playlist.json"), JSON.stringify({ modified: new Date(), files: req.body }));
+    res.send(getPlaylist());
+})
+
 var upload = multer({ storage: storage });
 app.post('/add', upload.single('file'), (req, res) => {
     const file = req.file;
