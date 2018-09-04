@@ -88,7 +88,7 @@ export default class Boot {
         });
     
         document.getElementById('appTitle').addEventListener('click', () => {
-            document.querySelector(':root').toggleClass('dark');
+            document.querySelector(':root').classList.toggle('dark');
         });
     
         document.getElementById('fileSelector').addEventListener('change', (event) => {

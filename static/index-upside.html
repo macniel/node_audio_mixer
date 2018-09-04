@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Audio Mixer v1.75</title>
+    <link rel="icon" href="icon-144.png">
+    <link rel="apple-touch-icon" href="/icon-57.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/icon-72.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/icon-114.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
+
+</head>
+
+<style>
+</style>
+
+<body>
+
+    <div id="appheader" class="header">
+        <div class="inner">
+            <h1 id="appTitle">Audio Mixer</h1>
+            <div class="btn-group">
+                    <input id="volumeTracker" type="range" class="tracker" min="0" max="1" step="0.01" value="1" />
+                    <button id="looper" class="material-icons toggle" onclick="switchLoopMode(this)">repeat</button>
+            <button id="uploader" class="material-icons" onclick="selectFile()">library_add</button>
+            <button id="stopAll" class="material-icons" onclick="stop()">stop</button>
+            
+            
+        </div>
+        </div>
+    </div>
+    <div class="workspace">
+    <div class="panel" style="height: 100%">
+    <div id="playlist">
+        
+    </div>
+    </div>
+    </div>
+
+    <audio id="player">
+        <source src="" type="audio/mp3" />
+    </audio>
+
+    <div class="dialog" id="editDialog" hidden>
+        <div class="entry">
+            <label for="title">Titel</label>
+            <input name="title" type="text" id="audioTitle">
+        </div>
+        <div class="entry">
+            <label for="section">Sektion</label>
+            <input name="section" type="text" id="audioSection">
+        </div>
+        <div class="entry">
+            <label>Farbe</label>
+            <div id="dialogSwatches"></div>
+        </div>
+        <button onclick="updateTrack()">Übernehmen</button>
+        <button onclick="cancelDialog()">Abbrechen</button>
+        <button onclick="removeTrack()" class="danger">Entfernen</button>
+    </div>
+
+
+    <div class="form-bottom" style="display: none">
+        <div class="inner">
+            <span id="nowPlaying" ></span>
+        </div>
+    </div>
+
+    <form name="uploadForm" action="/add" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileSelector">
+    </form>
+    <script src="http://localhost:1337/main.js" type="text/javascript"></script>
+
+</body>
+
+</html>
