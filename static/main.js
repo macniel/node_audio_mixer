@@ -21,4 +21,6 @@ if (!customElements.get('app-header')) {
     customElements.define('app-subsection', Header);
 }
 
-new Boot();
+window.onload = () => {
+    new Boot();
+}

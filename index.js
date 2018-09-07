@@ -184,22 +184,18 @@ app.get('/music/:fileRef', (req, res) => {
     }
 });
 
-app.get('/:filename', function (req, res) {
-    res.sendFile(path.join(__dirname, 'static', req.params['filename']));
+// static serving
+
+
+
+
+app.use('/', express.static('static'));
+
+
+// start server
+
+app.listen(1337, () => {
+
+    console.log('mixer is ready');
+
 });
-
-app.use(express.static('static'));
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'static', 'index.html'));
-});
-
-
-const server = app.listen(1337, () => {
-    console.log('listening on port 1337');
-    /*spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe', ['-app=http://localhost:1337']).on('close', () => {
-        console.log('client app terminated');
-        server.close();
-    }).on('error', (err) => {
-        console.log(err);
-    });*/
-})
