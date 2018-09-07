@@ -1,0 +1,38 @@
+.panel {
+    &.center {
+        top: var(--header-height);
+        padding-top: 8px;
+        bottom: 0;
+    }
+    &.north {
+        padding-top: calc(var(--header-height) + 8px);
+        top: 0;
+        height: var(--content-height);
+    }
+    &.south {
+        &:before {
+            background-color: var(--button-face-color);
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.75);
+            height: 16px;  
+            content: '';  
+        }
+        bottom: 0;
+        top: calc(var(--content-height) + var(--header-height) + 8px);
+    }
+    &.scrolly {
+        overflow-x: hidden;
+        overflow-y: scroll;
+    }
+    &.noscroll {
+        overflow: hidden;
+    }
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--workspace-color);
+}
